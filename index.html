@@ -1039,10 +1039,19 @@
     // stutter: two full decode passes over the same oversized images
     // instead of one. The <link rel="preload"> tags in <head> still warm
     // the network cache early; only the redundant decode is removed.
+    // The total is counted as trackAsset() gets called (registeredCount),
+    // not hardcoded — a fixed number silently goes stale the moment
+    // someone adds/removes a tracked image (e.g. this used to be 12 and
+    // missed the info-section photo entirely, which is exactly why 100%
+    // could be reached while that image was still loading). preloadSetupDone
+    // only flips true once every trackAsset() call in the whole script has
+    // run (they're all synchronous), so checkAllLoaded() can't fire early
+    // against a registeredCount that's still going up.
     const preloader = document.getElementById('preloader');
     const preloaderPercent = document.getElementById('preloader-percent');
-    const PRELOAD_TOTAL = 12; // 8 visual-section items + 4 gallery covers
+    let registeredCount = 0;
     let preloadedCount = 0;
+    let preloadSetupDone = false;
     let preloaderHidden = false;
     function hidePreloader() {
       if (preloaderHidden) return;
@@ -1050,13 +1059,17 @@
       if (preloader) preloader.classList.add('hidden');
       playVisualEntrance();
     }
+    function checkAllLoaded() {
+      if (preloadSetupDone && preloadedCount >= registeredCount) hidePreloader();
+    }
     function trackAsset(el, loadEvent) {
+      registeredCount++;
       const done = () => {
         preloadedCount++;
-        if (preloaderPercent) {
-          preloaderPercent.textContent = Math.round((preloadedCount / PRELOAD_TOTAL) * 100) + '%';
+        if (preloaderPercent && registeredCount > 0) {
+          preloaderPercent.textContent = Math.round((preloadedCount / registeredCount) * 100) + '%';
         }
-        if (preloadedCount >= PRELOAD_TOTAL) hidePreloader();
+        checkAllLoaded();
       };
       el.addEventListener(loadEvent, done, { once: true });
       el.addEventListener('error', done, { once: true });
@@ -1424,6 +1437,8 @@
     if (infoSection) {
       const infoPhoto = infoSection.querySelector('.info-photo');
       if (infoPhoto) infoPhoto.style.transform = 'rotate(-6deg)';
+      const infoPhotoImg = infoPhoto ? infoPhoto.querySelector('img') : null;
+      if (infoPhotoImg) trackAsset(infoPhotoImg, 'load');
 
       const infoAnimateTargets = [
         infoSection.querySelector('.info-heading'),
@@ -1572,6 +1587,13 @@
       if (projectOpen) return;
       updateHeaderVisibility(homeGallery.scrollTop);
     });
+
+    // Every trackAsset() call above ran synchronously while building the
+    // page — this is the last line of that same synchronous script, so
+    // registeredCount is now final. Only past this point is it safe to let
+    // checkAllLoaded() actually hide the preloader.
+    preloadSetupDone = true;
+    checkAllLoaded();
 
   </script>
 </body>
