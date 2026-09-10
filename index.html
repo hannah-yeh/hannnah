@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..1000&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="images/001.png">
+  <link rel="preload" as="image" href="images/002.png">
+  <link rel="preload" as="image" href="images/003.png">
+  <link rel="preload" as="video" href="images/004.mp4">
+  <link rel="preload" as="image" href="images/005.png">
+  <link rel="preload" as="image" href="images/006.png">
+  <link rel="preload" as="image" href="images/007.png">
+  <link rel="preload" as="image" href="images/008.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    ::selection {
+      background: #fff;
+      color: #000;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: #000000;
+      font-family: 'DM Sans', 'Noto Sans TC', sans-serif;
+      font-weight: 300;
+      letter-spacing: 0em;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        overflow: hidden;
+      }
+    }
+
+
+    #site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 30px 100px 2px 100px;
+      transform: translateY(0);
+      transition: transform 0.35s ease;
+    }
+
+    #site-header.site-header-hidden {
+      transform: translateY(-100%);
+    }
+
+    #site-tagline {
+      font-size: 40px;
+      font-weight: 300;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    #main-nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    #main-nav a {
+      display: inline-block;
+      font-size: 22px;
+      font-weight: 300;
+      color: #fff;
+      text-decoration: none;
+      padding: 0;
+    }
+
+    #main-nav a:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .nav-arrow {
+      font-size: 0.6em;
+      margin-left: 4px;
+    }
+
+    #home-gallery {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 4;
+      overflow-y: auto;
+      padding: 220px 40px 60px 40px;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s ease, visibility 0s linear 0s;
+    }
+
+    #home-gallery.hidden {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+    }
+
+    #visual-section {
+      position: relative;
+      width: calc(100% + 80px);
+      margin-left: -40px;
+      margin-right: -40px;
+      margin-top: -220px;
+      margin-bottom: 60px;
+      height: 220vh;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .visual-scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      right: 100px;
+      font-size: 32px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .drag-square {
+      position: absolute;
+      display: block;
+      object-fit: cover;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .drag-square.dragging {
+      cursor: grabbing;
+    }
+
+    #work-section {
+      margin-left: 60px;
+      margin-right: 60px;
+    }
+
+    #home-gallery-grid {
+      margin-bottom: 100px;
+      display: flex;
+      gap: 32px;
+    }
+
+    .gallery-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .work-heading {
+      font-size: 64px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 60px;
+    }
+
+    #info-section {
+      position: relative;
+      width: calc(100% + 80px);
+      margin-left: -40px;
+      margin-right: -40px;
+      height: auto;
+      padding: 80px 100px 8px 100px;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 100px;
+      overflow: hidden;
+    }
+
+    /* Real tick elements laid out with justify-content:space-between,
+       instead of a background-gradient pattern. A repeating tile pattern
+       (whether plain repeating-linear-gradient or background-repeat:round)
+       is fundamentally "tick, then gap" repeated N times — the container's
+       right edge always lands inside the LAST gap, never on a tick.
+       space-between distributes actual elements as N points, with the
+       first and last pinned exactly to the two edges — that's the only
+       way to guarantee a tick at both ends regardless of container width. */
+    .section-divider {
+      width: 100%;
+      height: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-divider span {
+      flex-shrink: 0;
+      width: 1.5px;
+      height: 10px;
+      background: #fff;
+    }
+
+    #work-section .section-divider {
+      margin-bottom: 70px;
+    }
+
+    #info-section .section-divider {
+      margin-bottom: 40px;
+    }
+
+    .info-columns {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: clamp(80px, calc(87.5vw - 1000px), 260px);
+    }
+
+    .info-left {
+      display: flex;
+      flex-direction: column;
+      gap: 100px;
+      flex: 0 1 690px;
+      min-width: 0;
+    }
+
+    .info-heading {
+      font-size: 64px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .info-heading-wave {
+      font-size: 50px;
+      margin-left: 12px;
+      vertical-align: middle;
+    }
+
+    .mobile-break {
+      display: none;
+    }
+
+    .info-label {
+      font-size: 20px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 20px;
+    }
+
+    .info-text-en {
+      font-size: 28px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.5;
+      max-width: 690px;
+    }
+
+    .info-text-zh {
+      font-size: 18px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'Noto Sans TC', sans-serif;
+      line-height: 1.75;
+      letter-spacing: 0.04em;
+      margin-top: 20px;
+      max-width: 690px;
+    }
+
+    .info-photo {
+      position: relative;
+      flex-shrink: 0;
+      margin-top: 2.778vw;
+      width: 13.125vw;
+      height: 16.406vw;
+      overflow: hidden;
+    }
+
+    .info-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .info-email {
+      font-size: 48px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      display: inline-block;
+      overflow-wrap: anywhere;
+      max-width: 100%;
+    }
+
+    .info-email:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .info-social-row {
+      display: flex;
+      align-items: baseline;
+      gap: 80px;
+      margin-top: 24px;
+    }
+
+    .info-social-item {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .info-social-item span,
+    .info-social-item a {
+      font-size: 24px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+    }
+
+    .info-social-item a {
+      display: inline-block;
+    }
+
+    .info-social-item a:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .info-footer {
+      align-self: flex-end;
+      margin-top: -60px;
+      font-size: 20px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .gallery-item {
+      position: relative;
+      cursor: crosshair;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .gallery-item.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gallery-media {
+      overflow: hidden;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+
+    .gallery-item.portrait img {
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+    }
+
+    .hover-cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      text-align: left;
+      padding: 16px 0 0 0;
+    }
+
+    .hover-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: #fff;
+      font-weight: 300;
+      line-height: 1.3;
+    }
+
+    .hover-text-en {
+      font-size: 24px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .hover-text-meta {
+      font-size: 20px;
+      color: rgba(255,255,255,0.4);
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    #project-panel {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 9;
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      overscroll-behavior: none;
+      background: #000;
+      padding: 0 0 30px 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+    }
+
+    #project-panel.visible {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s ease, visibility 0s linear 0s;
+    }
+
+    .project-cover {
+      width: 100%;
+      height: 45vh;
+      overflow: hidden;
+    }
+
+    .project-cover img {
+      width: 100%;
+      height: 150%;
+      object-fit: cover;
+      display: block;
+      will-change: transform;
+    }
+
+    .project-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 60px 100px 0 100px;
+    }
+
+    .project-title-en {
+      font-size: 60px;
+      font-weight: 300;
+      font-family: 'DM Sans', sans-serif;
+      color: #fff;
+      margin-top: 48px;
+      line-height: 1.1;
+    }
+
+    .project-title-zh {
+      font-size: 22px;
+      font-weight: 300;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #fff;
+      margin-top: 12px;
+      line-height: 1.6;
+      letter-spacing: 0.04em;
+    }
+
+    .project-meta {
+      display: flex;
+      gap: 80px;
+      margin-top: 48px;
+    }
+
+    .project-meta-label {
+      font-size: 15px;
+      color: rgba(255,255,255,0.4);
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 6px;
+      letter-spacing: 0em;
+    }
+
+    .project-meta-value {
+      font-size: 18px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .project-desc-en {
+      font-size: 28px;
+      font-weight: 300;
+      font-family: 'DM Sans', sans-serif;
+      color: #fff;
+      margin-top: 60px;
+      line-height: 1.6;
+      max-width: 900px;
+    }
+
+    .project-desc-zh {
+      font-size: 18px;
+      font-weight: 300;
+      font-family: 'Noto Sans TC', sans-serif;
+      color: #fff;
+      margin-top: 24px;
+      line-height: 1.75;
+      max-width: 900px;
+      letter-spacing: 0.04em;
+    }
+
+    #project-content-blocks {
+      margin-top: 60px;
+    }
+
+    #project-content-blocks > *:first-child {
+      margin-top: 0;
+    }
+
+    .project-block-image,
+    .project-block-video {
+      width: 100%;
+      margin-top: 16px;
+      display: block;
+    }
+
+    .project-block-video {
+      aspect-ratio: 16 / 9;
+    }
+
+    .project-block-video.vertical {
+      aspect-ratio: 9 / 16;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .project-block-video iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .project-block-details {
+      display: flex;
+      gap: 80px;
+      margin-top: 60px;
+      margin-bottom: 60px;
+      max-width: 900px;
+    }
+
+    .project-meta-value-zh {
+      font-size: 13px;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-weight: 300;
+      color: #fff;
+      margin-top: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .project-block-details .project-meta-value,
+    .project-block-credits .project-meta-value {
+      font-size: 20px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .project-block-details .project-meta-value-zh,
+    .project-block-credits .project-meta-value-zh {
+      font-size: 18px;
+      line-height: 1.75;
+      margin-top: 8px;
+      white-space: pre-line;
+    }
+
+    .project-block-credits {
+      margin-top: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .project-block-link {
+      margin-top: 60px;
+    }
+
+    .project-block-link a {
+      font-size: 32px;
+      font-weight: 300;
+      color: #fff;
+      text-decoration: none;
+      opacity: 0.4;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .project-block-link a:hover {
+      opacity: 1;
+    }
+
+    #project-next {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-top: 60px;
+      padding-top: 20px;
+      opacity: 0;
+      transform: translateX(-80px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    #project-next.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .project-next-inner {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .project-next-thumb {
+      width: 220px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background: #222;
+      display: block;
+    }
+
+    .project-next-name {
+      font-size: 32px;
+      font-weight: 300;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      opacity: 0.4;
+      margin-top: 16px;
+    }
+
+    .project-next-inner:hover .project-next-name {
+      opacity: 1;
+    }
+
+    /* Mobile overrides — kept last in the stylesheet on purpose: an
+       unconditional rule declared later always wins a same-specificity
+       cascade tie over one declared earlier, media query or not. Moving
+       this block anywhere above the plain desktop rules would silently
+       let those desktop values win again, even inside the @media block. */
+    @media (max-width: 767px) {
+      /* Fluid mobile scale: every value below is clamp(min, Nvw, max),
+         where Nvw = the original fixed px ÷ 400 (a representative mobile
+         width) × 100 — so at ~400px wide it renders at the original size,
+         and it scales continuously with the device instead of jumping
+         between fixed breakpoint snapshots. --m-side/--m-top are shared so
+         the full-bleed math (width/margin) stays consistent with the
+         padding it's compensating for. */
+      :root {
+        --m-side: clamp(14px, 5vw, 24px);
+        --m-top: clamp(100px, 32.5vw, 150px);
+        /* Shared type-scale for the project detail page: root font-size
+           fluidly interpolates between 45% and 68.75% of the 16px default
+           as width goes 320px -> 767px. Every project-page font-size below
+           is written in rem as a straight multiple of its desktop px value
+           (desktop_px / 16), so ALL of them get multiplied by this exact
+           same factor at every width — their relative size ratio to each
+           other always matches desktop, it can never drift or reorder. */
+        font-size: clamp(7.2px, calc(7.2px + 3.8 * (100vw - 320px) / 447), 11px);
+      }
+
+      body {
+        overflow-y: auto;
+      }
+
+      #site-header {
+        padding: clamp(14px, 5vw, 24px) var(--m-side);
+        gap: 2px 14px;
+        flex-wrap: wrap;
+      }
+
+      #site-tagline {
+        font-size: clamp(26px, 8.5vw, 40px);
+      }
+
+      #main-nav {
+        gap: 14px;
+      }
+
+      #main-nav a {
+        font-size: clamp(16px, 5vw, 22px);
+        padding: 4px 6px;
+      }
+
+      #home-gallery {
+        padding: var(--m-top) var(--m-side) clamp(28px, 10vw, 48px) var(--m-side);
+      }
+
+      #visual-section {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: calc(-1 * var(--m-top));
+        margin-bottom: clamp(28px, 10vw, 48px);
+        height: 180vh;
+      }
+
+      .visual-scroll-hint {
+        right: 0;
+        font-size: clamp(17px, 5.5vw, 26px);
+      }
+
+      .section-divider {
+        height: 6px;
+      }
+
+      .section-divider span {
+        width: 1px;
+        height: 6px;
+      }
+
+      #work-section {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .work-heading {
+        font-size: clamp(26px, 8.5vw, 40px);
+        margin-bottom: clamp(28px, 10vw, 48px);
+      }
+
+      #home-gallery-grid {
+        flex-direction: column;
+        gap: clamp(16px, 6vw, 28px);
+      }
+
+      .gallery-col {
+        display: contents;
+      }
+
+      #info-section {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        padding: clamp(40px, 15vw, 70px) 0 clamp(20px, 7.5vw, 36px) 0;
+        gap: clamp(36px, 15vw, 70px);
+      }
+
+      .info-columns {
+        flex-direction: column;
+        gap: clamp(24px, 10vw, 46px);
+      }
+
+      .info-left {
+        flex-basis: auto;
+        gap: clamp(36px, 15vw, 70px);
+      }
+
+      .info-heading {
+        font-size: clamp(26px, 8.5vw, 40px);
+      }
+
+      .info-heading-wave {
+        font-size: clamp(20px, 6.5vw, 30px);
+      }
+
+      .mobile-break {
+        display: inline;
+      }
+
+      .info-text-en {
+        font-size: clamp(16px, 5vw, 23px);
+        max-width: 100%;
+      }
+
+      .info-text-zh {
+        font-size: clamp(13px, 3.75vw, 17px);
+        max-width: 100%;
+      }
+
+      .info-photo {
+        width: clamp(100px, 32vw, 150px);
+        height: clamp(125px, 40vw, 185px);
+        margin-top: 0;
+        margin-left: var(--m-side);
+        order: -1;
+      }
+
+      .info-email {
+        font-size: clamp(20px, 6.5vw, 30px);
+      }
+
+      .info-social-row {
+        flex-wrap: wrap;
+        gap: clamp(16px, 6vw, 28px);
+      }
+
+      .info-footer {
+        margin-top: 0;
+        font-size: clamp(12px, 3.5vw, 16px);
+      }
+
+      #project-panel {
+        padding-bottom: clamp(60px, 20vw, 100px);
+      }
+
+      .project-content {
+        max-width: 100%;
+        padding: clamp(28px, 10vw, 48px) var(--m-side) 0 var(--m-side);
+      }
+
+      .project-title-en {
+        font-size: 4.5rem;
+      }
+
+      .project-title-zh {
+        font-size: 3rem;
+      }
+
+      .project-desc-en {
+        font-size: 2.2rem;
+      }
+
+      .project-desc-zh {
+        font-size: 1.9rem;
+      }
+
+      .project-meta {
+        gap: clamp(20px, 8vw, 38px);
+        flex-wrap: wrap;
+      }
+
+      .project-meta-label {
+        font-size: 1.6rem;
+      }
+
+      .project-meta-value {
+        font-size: 1.9rem;
+      }
+
+      .project-meta-value-zh {
+        font-size: 0.8125rem; /* 13px desktop */
+      }
+
+      .project-block-details {
+        flex-direction: column;
+        gap: clamp(16px, 6vw, 28px);
+      }
+
+      .project-block-details .project-meta-value,
+      .project-block-credits .project-meta-value {
+        font-size: 2.2rem;
+      }
+
+      .project-block-details .project-meta-value-zh,
+      .project-block-credits .project-meta-value-zh {
+        font-size: 1.9rem;
+      }
+
+      .project-block-link a {
+        font-size: 3rem;
+      }
+
+      .project-next-thumb {
+        width: clamp(100px, 35vw, 165px);
+      }
+
+      .project-next-name {
+        font-size: 3rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <header id="site-header">
+    <div id="site-tagline">JHIH-HAN YEH</div>
+    <nav id="main-nav">
+      <a href="#work-section" id="btn-work">Work<span class="nav-arrow">↵</span></a>
+      <a href="#info-section" id="btn-about">About<span class="nav-arrow">↵</span></a>
+      <a href="#info-section" id="btn-contact">Contact<span class="nav-arrow">↵</span></a>
+    </nav>
+  </header>
+
+  <div id="home-gallery">
+    <div id="visual-section">
+      <div class="visual-scroll-hint">↓</div>
+    </div>
+    <div id="work-section">
+      <div class="section-divider"></div>
+
+      <div class="work-heading">Works+</div>
+      <div id="home-gallery-grid"></div>
+    </div>
+
+    <div id="info-section">
+      <div class="section-divider"></div>
+
+      <div class="info-heading">Heyyy,<br class="mobile-break"> Hannah here<span class="info-heading-wave">👋👋👋</span></div>
+
+      <div class="info-columns">
+        <div class="info-left">
+          <div class="info-about">
+            <div class="info-label">//About</div>
+            <p class="info-text-en">I'm a design student who loves creating fun digital experiences. Interaction Design is where I find my groove, spanning across Web, UI/UX, Digital Art, and Interactive Installations.</p>
+            <p class="info-text-zh">我是一名設計系學生，我喜歡創造好玩的數位體驗！互動設計是我最能找到節奏的地方，範圍涵蓋了網頁、UI/UX、數位藝術和互動裝置。</p>
+          </div>
+
+          <div class="info-contact">
+            <div class="info-label">//Contact</div>
+            <a href="mailto:hannah9303024@gmail.com" class="info-email">hannah9303024@gmail.com</a>
+            <div class="info-social-row">
+              <div class="info-social-item">
+                <span>Iηsτagr@ო</span>
+                <a href="https://www.instagram.com/hann.yeh/?hl=zh-tw" target="_blank">@hann.yeh</a>
+              </div>
+              <div class="info-social-item">
+                <span>Bεhαn©ᴇ</span>
+                <a href="https://www.behance.net/hannahyeh" target="_blank">hannahyeh</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-photo">
+          <img src="images/hana01.png" alt="">
+        </div>
+      </div>
+
+      <div class="info-footer">© 2026 Hannah Yeh</div>
+    </div>
+  </div>
+
+  <div id="project-panel">
+    <div class="project-cover">
+      <img id="project-cover-img" src="" alt="">
+    </div>
+    <div class="project-content">
+      <div class="project-title-en" id="project-title-en"></div>
+      <div class="project-title-zh" id="project-title-zh"></div>
+      <div class="project-meta">
+        <div>
+          <div class="project-meta-label">(Year)</div>
+          <div class="project-meta-value" id="project-year"></div>
+        </div>
+        <div>
+          <div class="project-meta-label">(Media)</div>
+          <div class="project-meta-value" id="project-media"></div>
+        </div>
+        <div>
+          <div class="project-meta-label">(Type)</div>
+          <div class="project-meta-value" id="project-type"></div>
+        </div>
+      </div>
+      <p class="project-desc-en" id="project-desc-en"></p>
+      <p class="project-desc-zh" id="project-desc-zh"></p>
+      <div id="project-content-blocks"></div>
+      <div id="project-next"></div>
+    </div>
+  </div>
+
+
+  <script src="projects.js"></script>
+  <script>
+
+    const ARROW_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 14" width="26" height="22" style="vertical-align:middle;margin-left:10px;transform:rotate(-45deg);display:inline-block;"><line x1="0" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="1" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="13" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+    // Fixed tick count (not width-derived) — fewer on mobile so the same
+    // divider reads as less dense on a narrow screen, matching how the
+    // rest of the mobile layout is deliberately sparser than desktop.
+    const DIVIDER_TICKS = window.matchMedia('(max-width: 767px)').matches ? 16 : 40;
+    document.querySelectorAll('.section-divider').forEach(divider => {
+      for (let i = 0; i < DIVIDER_TICKS; i++) {
+        divider.appendChild(document.createElement('span'));
+      }
+    });
+
+    let projectOpen = false;
+    const projectPanel = document.getElementById('project-panel');
+    const homeGallery  = document.getElementById('home-gallery');
+    const homeGalleryGrid = document.getElementById('home-gallery-grid');
+
+    const siteHeader = document.getElementById('site-header');
+    const siteTagline = document.getElementById('site-tagline');
+
+    siteTagline.addEventListener('click', () => {
+      if (projectOpen) closeProject();
+    });
+
+    function goToSection(id) {
+      const target = document.getElementById(id);
+      if (!target) return;
+      if (projectOpen) {
+        closeProject();
+        requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+      } else {
+        target.scrollIntoView({ block: 'start' });
+      }
+    }
+
+    ['btn-work', 'btn-about', 'btn-contact'].forEach(id => {
+      const link = document.getElementById(id);
+      const targetId = link.getAttribute('href').slice(1);
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        goToSection(targetId);
+      });
+    });
+
+    let headerLastScroll = 0;
+    function updateHeaderVisibility(scrollTop) {
+      if (scrollTop > headerLastScroll && scrollTop > 80) {
+        siteHeader.classList.add('site-header-hidden');
+      } else if (scrollTop < headerLastScroll) {
+        siteHeader.classList.remove('site-header-hidden');
+      }
+      headerLastScroll = scrollTop;
+    }
+    function resetHeaderVisibility() {
+      headerLastScroll = 0;
+      siteHeader.classList.remove('site-header-hidden');
+    }
+
+    function updateHomeGalleryVisibility() {
+      homeGallery.classList.toggle('hidden', projectOpen);
+    }
+
+    function animateChildrenIn(containerOrItems, skipFirst = false, excludeSelector = null) {
+      const isList = Array.isArray(containerOrItems);
+      if (!isList && containerOrItems.scrollTop !== undefined) containerOrItems.scrollTop = 0;
+      let items = isList ? containerOrItems.slice() : [...containerOrItems.children];
+      if (skipFirst) items.shift();
+      if (excludeSelector) items = items.filter(el => !el.matches(excludeSelector));
+      const origTransforms = items.map(el => el.style.transform);
+      items.forEach((el, i) => {
+        el.style.opacity = '0';
+        const base = origTransforms[i];
+        el.style.transform = base ? `${base} translateY(24px)` : 'translateY(24px)';
+        el.style.transition = 'none';
+      });
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        items.forEach((el, i) => {
+          el.style.transition = `opacity 0.55s ease ${180 + i * 100}ms, transform 0.55s ease ${180 + i * 100}ms`;
+          el.style.opacity = '1';
+          el.style.transform = origTransforms[i] || '';
+        });
+      }));
+    }
+
+    function addHoverCover(item, p) {
+      const cover = document.createElement('div');
+      cover.className = 'hover-cover';
+      cover.innerHTML = `
+        <div class="hover-text">
+          <div class="hover-text-en">${p.title}</div>
+          <div class="hover-text-meta">${[p.year, p.type].filter(Boolean).join(' • ')}</div>
+        </div>
+      `;
+      item.appendChild(cover);
+    }
+
+    const galleryColLeft = document.createElement('div');
+    galleryColLeft.className = 'gallery-col';
+    const galleryColRight = document.createElement('div');
+    galleryColRight.className = 'gallery-col';
+    homeGalleryGrid.append(galleryColLeft, galleryColRight);
+
+    const galleryItems = [];
+    Object.entries(PROJECTS).forEach(([key, p], i) => {
+      const gridItem = document.createElement('div');
+      gridItem.className = p.previewOrientation === 'portrait' ? 'gallery-item portrait' : 'gallery-item';
+      gridItem.dataset.key = key;
+      // Split across two DOM containers for desktop's independent two-
+      // column layout (needed so column heights don't cross-depend on each
+      // other — see .gallery-col). On mobile the two containers flatten
+      // via display:contents, which preserves DOM order (left column's
+      // items, then right column's) rather than the original 0,1,2,3
+      // order. This `order` matches each item to its true catalog index,
+      // so the flattened mobile layout still reads 0,1,2,3 — while doing
+      // nothing on desktop, since each column already appends in
+      // ascending index order regardless.
+      gridItem.style.order = i;
+      gridItem.innerHTML = `<div class="gallery-media"><img src="${p.cover}" alt="${p.title}"></div>`;
+      addHoverCover(gridItem, p);
+      (i % 2 === 0 ? galleryColLeft : galleryColRight).appendChild(gridItem);
+      galleryItems.push(gridItem);
+    });
+
+    // Each item reveals itself as it individually scrolls into view, rather
+    // than one bulk stagger fired the moment the grid's top edge appears.
+    // On mobile's single, much taller column, that bulk trigger meant the
+    // whole staggered sequence (~1s total) had already finished playing
+    // out before the user scrolled far enough to actually see items 3-4 —
+    // they'd just appear pre-settled, with no visible entrance animation.
+    const galleryObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          galleryObserver.unobserve(entry.target);
+        }
+      });
+    }, { root: homeGallery, threshold: 0.1 });
+    galleryItems.forEach(el => galleryObserver.observe(el));
+
+    const visualSection = document.getElementById('visual-section');
+    if (visualSection) {
+      const REF_WIDTH = 1440;
+      const MOBILE_REF_WIDTH = 390;
+      const MAX_SCALE = 1.35;
+      // MAX_SCALE was tuned for the desktop reference (clamps growth past
+      // ~1944px-wide screens). Reused as-is it would clamp mobile scale
+      // the moment clientWidth passed 390*1.35=527px — over half of the
+      // 0-767px mobile range would then render at a flat, un-growing size
+      // instead of continuing to scale up with the viewport. Mobile gets
+      // its own ceiling sized for its own reference width instead.
+      const MOBILE_MAX_SCALE = 768 / MOBILE_REF_WIDTH;
+      const IS_MOBILE = visualSection.clientWidth < 768;
+
+      // On narrow (mobile) screens a fixed 100px margin on each side would
+      // eat most of the available width, so shrink the drag boundary there.
+      // 0 on mobile so items (in particular 003, which now rests flush
+      // against both screen edges — see MOBILE_ITEMS) can still be dragged
+      // all the way to the edge instead of snapping inward on first touch.
+      // Threshold matches IS_MOBILE (768), not some other cutoff — using a
+      // different breakpoint here than the one that decides which item set
+      // and scale reference apply would let a width range fall between the
+      // two: mobile's edge-flush layout with a desktop-sized inset, which
+      // snaps the item inward the instant a drag starts.
+      function getDragInset() {
+        return IS_MOBILE ? 0 : 100;
+      }
+
+      // Reference pixel layout (verified non-overlapping at 1440px wide).
+      // Every item scales by the SAME width-derived factor, so the whole
+      // composition behaves as one rigid artboard — uniform scaling can
+      // never turn a non-overlapping layout into an overlapping one, at
+      // any viewport width. Each item's w/h matches its own image's real
+      // aspect ratio, so object-fit never has to crop anything.
+      const ITEMS = [
+        { type: 'image', src: 'images/001.png', left: 840.0, top: 118.3, w: 500, h: 433 },
+        { type: 'image', src: 'images/002.png', left: 379.7, top: 223.9, w: 390, h: 231 },
+        { type: 'image', src: 'images/003.png', left: 100.0, top: 530.0, w: 682, h: 560 },
+        { type: 'video', src: 'images/004.mp4', left: 970.0, top: 675.0, w: 280, h: 280 },
+        { type: 'image', src: 'images/005.png', left: 140.0, top: 190.0, w: 210, h: 170 },
+        { type: 'image', src: 'images/006.png', left: 109.6, top: 1169.7, w: 280, h: 375 },
+        { type: 'image', src: 'images/008.png', left: 480.5, top: 1265.1, w: 220, h: 435 },
+        { type: 'image', src: 'images/007.png', left: 806.0, top: 1117.8, w: 534, h: 358 },
+      ];
+
+      // A dedicated mobile layout instead of reusing (and just rescaling)
+      // the desktop one — reusing it can only ever make items as big,
+      // relative to the screen, as they already are on desktop. Getting
+      // meaningfully bigger needs its own arrangement built for a narrow,
+      // tall screen: mostly single-column, with 003 (the largest image)
+      // going full-bleed edge-to-edge since it's already the constraint
+      // that caps how big everything else can get. Reference width 390
+      // matches a typical phone, so these numbers read close to literal
+      // px on a real device. Verified non-overlapping at this reference
+      // size (see conversation scratch work) the same way the desktop
+      // layout above was.
+      const MOBILE_ITEMS = [
+        { type: 'image', src: 'images/001.png', left: 169, top: 148, w: 221, h: 191 },
+        { type: 'image', src: 'images/005.png', left: 30, top: 230, w: 135, h: 109 },
+        { type: 'video', src: 'images/004.mp4', left: 224, top: 370, w: 166, h: 166 },
+        { type: 'image', src: 'images/002.png', left: 5, top: 375, w: 192, h: 114 },
+        { type: 'image', src: 'images/003.png', left: 0, top: 565, w: 371, h: 308 },
+        { type: 'image', src: 'images/006.png', left: 100, top: 1130, w: 162, h: 217 },
+        { type: 'image', src: 'images/007.png', left: 5, top: 920, w: 247, h: 166 },
+        { type: 'image', src: 'images/008.png', left: 280, top: 970, w: 102, h: 202 },
+      ];
+
+      function getScale() {
+        const refWidth = IS_MOBILE ? MOBILE_REF_WIDTH : REF_WIDTH;
+        const maxScale = IS_MOBILE ? MOBILE_MAX_SCALE : MAX_SCALE;
+        return Math.min(visualSection.clientWidth / refWidth, maxScale);
+      }
+
+      function positionItem({ el, left, top, w, h }) {
+        const scale = getScale();
+        el.style.width = (w * scale) + 'px';
+        el.style.height = (h * scale) + 'px';
+        el.style.left = (left * scale) + 'px';
+        el.style.top = (top * scale) + 'px';
+      }
+
+      // The section's height used to be a guessed vh value on both
+      // breakpoints — items are position:absolute, so they don't naturally
+      // expand a CSS height:auto container, and a fixed vh either clips the
+      // lowest item on a shorter screen or leaves excess empty space on a
+      // taller one. Deriving it from the actual layout (lowest item's
+      // bottom edge, scaled the same way the items themselves are, plus
+      // some breathing room) fits every screen height exactly instead of
+      // guessing, on both mobile and desktop.
+      const BOTTOM_SPACE = 200;
+      function updateVisualSectionHeight() {
+        const scale = getScale();
+        const items = IS_MOBILE ? MOBILE_ITEMS : ITEMS;
+        const maxBottom = Math.max(...items.map(item => item.top + item.h));
+        visualSection.style.height = ((maxBottom + BOTTOM_SPACE) * scale) + 'px';
+      }
+
+      const dragItems = (IS_MOBILE ? MOBILE_ITEMS : ITEMS).map(({ type, src, left, top, w, h }) => {
+        let sq;
+        if (type === 'video') {
+          sq = document.createElement('video');
+          sq.src = src;
+          sq.muted = true;
+          sq.autoplay = true;
+          sq.loop = true;
+          sq.playsInline = true;
+        } else {
+          sq = document.createElement('img');
+          sq.src = src;
+          sq.alt = '';
+        }
+        sq.className = 'drag-square';
+        visualSection.appendChild(sq);
+        if (type === 'video') sq.play().catch(() => {});
+        return { el: sq, left, top, w, h };
+      });
+
+      dragItems.forEach(positionItem);
+      updateVisualSectionHeight();
+      window.addEventListener('resize', () => {
+        if (visualSection.clientWidth > 0) {
+          dragItems.forEach(positionItem);
+          updateVisualSectionHeight();
+        }
+      });
+
+      // One-time entrance: scatter each item out from the viewport's center
+      // to its resting position, one after another. Uses transform only
+      // (never touches left/top), so it can't affect drag/resize logic.
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      dragItems.forEach(item => {
+        const rect = item.el.getBoundingClientRect();
+        const dx = centerX - (rect.left + rect.width / 2);
+        const dy = centerY - (rect.top + rect.height / 2);
+        item.el.style.transition = 'none';
+        item.el.style.transform = `translate(${dx}px, ${dy}px) scale(0.4)`;
+      });
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        dragItems.forEach((item, i) => {
+          item.el.style.transition = `transform 1.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 120}ms`;
+          item.el.style.transform = 'translate(0, 0) scale(1)';
+          // Clear the transition once this item's reveal finishes, so later
+          // drag-driven transform updates apply instantly instead of easing.
+          setTimeout(() => { item.el.style.transition = ''; }, i * 120 + 1850);
+        });
+      }));
+
+      const squares = dragItems.map(item => item.el);
+
+      let dragEl = null, dragStartX = 0, dragStartY = 0, dragBaseLeft = 0, dragBaseTop = 0;
+      let dragMinX = 0, dragMaxX = 0, dragMinY = 0, dragMaxY = 0;
+      let topZ = 1;
+
+      function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+      function startDrag(e, el) {
+        dragEl = el;
+        el.style.zIndex = ++topZ;
+        delete el._pendingLeft;
+        delete el._pendingTop;
+        const point = e.touches ? e.touches[0] : e;
+        dragStartX = point.clientX;
+        dragStartY = point.clientY;
+        dragBaseLeft = el.offsetLeft;
+        dragBaseTop = el.offsetTop;
+        // Read layout bounds once per drag gesture, not on every mousemove —
+        // repeatedly reading clientWidth/clientHeight forces a layout reflow
+        // each time, which is what caused the stutter during dragging.
+        const dragInset = getDragInset();
+        dragMinX = dragInset;
+        dragMaxX = visualSection.clientWidth - dragInset - el.offsetWidth;
+        dragMinY = 0;
+        dragMaxY = visualSection.clientHeight - el.offsetHeight;
+        el.classList.add('dragging');
+        e.preventDefault();
+      }
+
+      function onDrag(e) {
+        if (!dragEl) return;
+        const point = e.touches ? e.touches[0] : e;
+        const dx = point.clientX - dragStartX;
+        const dy = point.clientY - dragStartY;
+        const targetLeft = clamp(dragBaseLeft + dx, dragMinX, dragMaxX);
+        const targetTop = clamp(dragBaseTop + dy, dragMinY, dragMaxY);
+        // Move via transform during the drag (compositor-only, no layout
+        // reflow); the real left/top only get written once, on release.
+        dragEl.style.transform = `translate(${targetLeft - dragBaseLeft}px, ${targetTop - dragBaseTop}px)`;
+        dragEl._pendingLeft = targetLeft;
+        dragEl._pendingTop = targetTop;
+      }
+
+      function endDrag() {
+        if (dragEl && dragEl._pendingLeft !== undefined) {
+          dragEl.style.left = dragEl._pendingLeft + 'px';
+          dragEl.style.top = dragEl._pendingTop + 'px';
+          dragEl.style.transform = '';
+          dragEl.classList.remove('dragging');
+        }
+        dragEl = null;
+      }
+
+      squares.forEach(sq => {
+        sq.addEventListener('mousedown', e => startDrag(e, sq));
+        sq.addEventListener('touchstart', e => startDrag(e, sq), { passive: false });
+      });
+      document.addEventListener('mousemove', onDrag);
+      document.addEventListener('touchmove', onDrag, { passive: false });
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+
+    const infoSection = document.getElementById('info-section');
+    if (infoSection) {
+      const infoPhoto = infoSection.querySelector('.info-photo');
+      if (infoPhoto) infoPhoto.style.transform = 'rotate(-6deg)';
+
+      // The photo used to sit out of this stagger because its transform
+      // was needed for the mouse-follow effect — that effect is gone now,
+      // so it can join the reveal like everything else. animateChildrenIn
+      // captures each element's transform (already 'rotate(-6deg)' for the
+      // photo, set above) before stacking translateY(24px) on top for the
+      // hidden state, then restores the original transform once revealed.
+      const infoAnimateTargets = [
+        infoSection.querySelector('.info-heading'),
+        infoSection.querySelector('.info-about'),
+        infoSection.querySelector('.info-contact'),
+        infoPhoto,
+      ].filter(Boolean);
+
+      infoAnimateTargets.forEach(el => { el.style.opacity = '0'; });
+
+      let infoAnimated = false;
+      const infoObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !infoAnimated) {
+            infoAnimated = true;
+            animateChildrenIn(infoAnimateTargets);
+            infoObserver.disconnect();
+          }
+        });
+      }, { root: homeGallery, threshold: 0.2 });
+      infoObserver.observe(infoSection);
+    }
+
+    function youtubeId(url) {
+      const m = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/) || url.match(/shorts\/([^?]+)/);
+      return m ? m[1] : null;
+    }
+
+    function renderMetaItems(items) {
+      return items.map(item => `
+        <div>
+          <div class="project-meta-label">(${item.label})</div>
+          ${item.value   ? `<div class="project-meta-value">${item.value}</div>`     : ''}
+          ${item.valueZh ? `<div class="project-meta-value-zh">${item.valueZh}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderContentBlocks(blocks) {
+      const container = document.getElementById('project-content-blocks');
+      container.innerHTML = '';
+      if (!blocks || !blocks.length) return;
+      blocks.forEach(block => {
+        if (block.type === 'image') {
+          const img = document.createElement('img');
+          img.src = block.src;
+          img.alt = '';
+          img.className = 'project-block-image';
+          container.appendChild(img);
+        } else if (block.type === 'video') {
+          const id = youtubeId(block.url);
+          if (!id) return;
+          const isShorts = /shorts\//.test(block.url);
+          const wrap = document.createElement('div');
+          wrap.className = isShorts ? 'project-block-video vertical' : 'project-block-video';
+          wrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
+          container.appendChild(wrap);
+        } else if (block.type === 'link') {
+          const wrap = document.createElement('div');
+          wrap.className = 'project-block-link';
+          wrap.innerHTML = `<a href="${block.url}" target="_blank" rel="noopener">${block.label} ${ARROW_SVG}</a>`;
+          container.appendChild(wrap);
+        } else if (block.type === 'details' || block.type === 'credits') {
+          const div = document.createElement('div');
+          div.className = block.type === 'details' ? 'project-block-details' : 'project-block-credits';
+          div.innerHTML = renderMetaItems(block.items);
+          container.appendChild(div);
+        }
+      });
+    }
+
+    const projCoverImg  = document.getElementById('project-cover-img');
+    const projTitleEn   = document.getElementById('project-title-en');
+    const projTitleZh   = document.getElementById('project-title-zh');
+    const projYear      = document.getElementById('project-year');
+    const projMedia     = document.getElementById('project-media');
+    const projType      = document.getElementById('project-type');
+    const projDescEn    = document.getElementById('project-desc-en');
+    const projDescZh    = document.getElementById('project-desc-zh');
+    const projNextEl    = document.getElementById('project-next');
+
+    const projectNextObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('in-view');
+      });
+    }, { root: projectPanel, threshold: 0.1 });
+    projectNextObserver.observe(projNextEl);
+
+    function openProject(key) {
+      const p = PROJECTS[key];
+      if (!p) return;
+      projNextEl.classList.remove('in-view');
+      projCoverImg.src = p.cover || '';
+      projCoverImg.style.display = p.cover ? 'block' : 'none';
+      projTitleEn.textContent  = p.title;
+      projTitleZh.textContent  = p.titleZh || '';
+      projYear.textContent     = p.year || '';
+      projMedia.textContent    = p.media || '';
+      projType.textContent     = p.type || '';
+      projDescEn.textContent   = p.description || '';
+      projDescZh.textContent   = p.descriptionZh || '';
+      renderContentBlocks(p.content);
+
+      const keys = Object.keys(PROJECTS);
+      const nextKey = keys[(keys.indexOf(key) + 1) % keys.length];
+      const nextP = PROJECTS[nextKey];
+      const nextEl = projNextEl;
+      nextEl.innerHTML = `
+        <div class="project-next-inner">
+          ${nextP.cover ? `<img class="project-next-thumb" src="${nextP.cover}" alt="${nextP.title}">` : '<div class="project-next-thumb"></div>'}
+          <div class="project-next-name">${nextP.title} ${ARROW_SVG}</div>
+        </div>
+      `;
+      nextEl.querySelector('.project-next-inner').onclick = () => openProject(nextKey);
+      projectPanel.classList.add('visible');
+      projectOpen = true;
+      projectPanel.scrollTop = 0;
+      animateChildrenIn(projectPanel.querySelector('.project-content'), false, '#project-next');
+      resetHeaderVisibility();
+      updateHomeGalleryVisibility();
+      requestAnimationFrame(() => {
+        projectPanel.scrollTop = 0;
+      });
+    }
+
+    function closeProject() {
+      projectPanel.classList.remove('visible');
+      projectOpen = false;
+      updateHomeGalleryVisibility();
+      resetHeaderVisibility();
+    }
+
+    projectPanel.addEventListener('scroll', () => {
+      projCoverImg.style.transform = `translateY(${projectPanel.scrollTop * 0.4}px)`;
+      updateHeaderVisibility(projectPanel.scrollTop);
+    });
+
+    projectPanel.addEventListener('click', e => e.stopPropagation());
+
+    homeGallery.addEventListener('click', e => {
+      const item = e.target.closest('[data-key]');
+      if (item) openProject(item.dataset.key);
+    });
+
+    homeGallery.addEventListener('scroll', () => {
+      if (projectOpen) return;
+      updateHeaderVisibility(homeGallery.scrollTop);
+    });
+
+  </script>
+</body>
+</html>
