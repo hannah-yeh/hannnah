@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portfolio</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..1000&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
@@ -41,6 +42,31 @@
       body {
         overflow: hidden;
       }
+    }
+
+    #preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: #000;
+      transition: opacity 0.6s ease, visibility 0s linear 0s;
+    }
+
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+    }
+
+    #preloader-percent {
+      position: absolute;
+      right: 40px;
+      bottom: 40px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 120px;
+      font-weight: 300;
+      color: #fff;
     }
 
 
@@ -685,6 +711,12 @@
         overflow-y: auto;
       }
 
+      #preloader-percent {
+        right: var(--m-side);
+        bottom: var(--m-side);
+        font-size: clamp(48px, 20vw, 90px);
+      }
+
       #site-header {
         padding: clamp(14px, 5vw, 24px) var(--m-side);
         gap: 2px 14px;
@@ -885,6 +917,10 @@
   </style>
 </head>
 <body>
+  <div id="preloader">
+    <div id="preloader-percent">0%</div>
+  </div>
+
   <header id="site-header">
     <div id="site-tagline">JHIH-HAN YEH</div>
     <nav id="main-nav">
@@ -976,6 +1012,56 @@
   <script>
 
     const ARROW_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 14" width="26" height="22" style="vertical-align:middle;margin-left:10px;transform:rotate(-45deg);display:inline-block;"><line x1="0" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="1" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="13" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+    // Set (reassigned below, once the visual section's drag items exist)
+    // to actually kick off their scatter-in entrance animation. Declared
+    // up here so the preloader can call it once loading finishes, even
+    // though that reassignment happens later in the script.
+    let playVisualEntrance = () => {};
+
+    // Full-screen black cover with a percentage counter, shown until the
+    // homepage's own images (the visual-section collage + the 4 gallery
+    // covers) have actually finished loading. Previously the visual
+    // section's scatter-in animation started the instant the page script
+    // ran, well before the images had downloaded — so items visibly flew
+    // into place as empty/broken boxes and only "became" the photo after
+    // the fact. A hard timeout guards against a stalled asset (slow
+    // network, one broken URL) trapping the visitor on a black screen
+    // forever.
+    //
+    // trackAsset() hooks the *actual* <img>/<video> elements that get
+    // created further down (one set for the visual section, one for the
+    // gallery covers) instead of spinning up a second, separate Image()/
+    // <video> per file just to watch it load. These source photos are huge
+    // (multi-thousand-px originals), so decoding each one twice — once for
+    // a throwaway tracking object, once for the real on-page element — was
+    // real, measurable CPU work, and on mobile hardware that was the
+    // stutter: two full decode passes over the same oversized images
+    // instead of one. The <link rel="preload"> tags in <head> still warm
+    // the network cache early; only the redundant decode is removed.
+    const preloader = document.getElementById('preloader');
+    const preloaderPercent = document.getElementById('preloader-percent');
+    const PRELOAD_TOTAL = 12; // 8 visual-section items + 4 gallery covers
+    let preloadedCount = 0;
+    let preloaderHidden = false;
+    function hidePreloader() {
+      if (preloaderHidden) return;
+      preloaderHidden = true;
+      if (preloader) preloader.classList.add('hidden');
+      playVisualEntrance();
+    }
+    function trackAsset(el, loadEvent) {
+      const done = () => {
+        preloadedCount++;
+        if (preloaderPercent) {
+          preloaderPercent.textContent = Math.round((preloadedCount / PRELOAD_TOTAL) * 100) + '%';
+        }
+        if (preloadedCount >= PRELOAD_TOTAL) hidePreloader();
+      };
+      el.addEventListener(loadEvent, done, { once: true });
+      el.addEventListener('error', done, { once: true });
+    }
+    setTimeout(hidePreloader, 8000);
 
     // Fixed tick count (not width-derived) — fewer on mobile so the same
     // divider reads as less dense on a narrow screen, matching how the
@@ -1093,6 +1179,7 @@
       // ascending index order regardless.
       gridItem.style.order = i;
       gridItem.innerHTML = `<div class="gallery-media"><img src="${p.cover}" alt="${p.title}"></div>`;
+      trackAsset(gridItem.querySelector('img'), 'load');
       addHoverCover(gridItem, p);
       (i % 2 === 0 ? galleryColLeft : galleryColRight).appendChild(gridItem);
       galleryItems.push(gridItem);
@@ -1227,6 +1314,7 @@
         }
         sq.className = 'drag-square';
         visualSection.appendChild(sq);
+        trackAsset(sq, type === 'video' ? 'loadeddata' : 'load');
         if (type === 'video') sq.play().catch(() => {});
         return { el: sq, left, top, w, h };
       });
@@ -1243,6 +1331,10 @@
       // One-time entrance: scatter each item out from the viewport's center
       // to its resting position, one after another. Uses transform only
       // (never touches left/top), so it can't affect drag/resize logic.
+      // The scattered starting state is set immediately (it's invisible
+      // behind the preloader anyway), but actually playing the animation
+      // is deferred — see playVisualEntrance — until the preloader confirms
+      // these images have actually finished loading.
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
       dragItems.forEach(item => {
@@ -1252,15 +1344,17 @@
         item.el.style.transition = 'none';
         item.el.style.transform = `translate(${dx}px, ${dy}px) scale(0.4)`;
       });
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        dragItems.forEach((item, i) => {
-          item.el.style.transition = `transform 1.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 120}ms`;
-          item.el.style.transform = 'translate(0, 0) scale(1)';
-          // Clear the transition once this item's reveal finishes, so later
-          // drag-driven transform updates apply instantly instead of easing.
-          setTimeout(() => { item.el.style.transition = ''; }, i * 120 + 1850);
-        });
-      }));
+      playVisualEntrance = () => {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          dragItems.forEach((item, i) => {
+            item.el.style.transition = `transform 1.8s cubic-bezier(0.16, 1, 0.3, 1) ${i * 120}ms`;
+            item.el.style.transform = 'translate(0, 0) scale(1)';
+            // Clear the transition once this item's reveal finishes, so later
+            // drag-driven transform updates apply instantly instead of easing.
+            setTimeout(() => { item.el.style.transition = ''; }, i * 120 + 1850);
+          });
+        }));
+      };
 
       const squares = dragItems.map(item => item.el);
 
@@ -1331,12 +1425,6 @@
       const infoPhoto = infoSection.querySelector('.info-photo');
       if (infoPhoto) infoPhoto.style.transform = 'rotate(-6deg)';
 
-      // The photo used to sit out of this stagger because its transform
-      // was needed for the mouse-follow effect — that effect is gone now,
-      // so it can join the reveal like everything else. animateChildrenIn
-      // captures each element's transform (already 'rotate(-6deg)' for the
-      // photo, set above) before stacking translateY(24px) on top for the
-      // hidden state, then restores the original transform once revealed.
       const infoAnimateTargets = [
         infoSection.querySelector('.info-heading'),
         infoSection.querySelector('.info-about'),

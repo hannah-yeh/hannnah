@@ -69,7 +69,7 @@ const PROJECTS = {
       ]},
       { type: 'image', src: 'images/betweenfaces_8.png' },
       { type: 'credits', items: [
-        { label: 'Advisor', valueZh: '陳威志、高捷、王世偉' },
+        { label: 'Advisor', valueZh: '陳威志、高捷' },
       ]},
     ],
   },
